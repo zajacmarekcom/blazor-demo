@@ -1,37 +1,23 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">BlazorDemo.UI</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </li>
-    </ul>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+﻿<Menu DefaultSelectedKeys=@(new[]{"1"})
+        DefaultOpenKeys=@(new[]{"sub1"})
+        Mode=MenuMode.Horizontal
+        Theme=MenuTheme.Dark>
+    <MenuItem Key="1">
+        <MenuLink Href="/" Match="NavLinkMatch.Prefix">
+            <Icon Type="pie-chart" Theme="outline"></Icon>
+            <span>Dashboard</span>
+        </MenuLink>
+        
+    </MenuItem>
+    <MenuItem Key="2">
+        <MenuLink Href="/counter" Match="NavLinkMatch.Prefix">
+            <Icon Type="desktop" Theme="outline"></Icon>
+            <span>Counter</span>
+        </MenuLink>
+        
+    </MenuItem>
+    <MenuItem Key="3">
+        <Icon Type="container" Theme="outline"></Icon>
+        <span>Option 3</span>
+    </MenuItem>
+</Menu>
