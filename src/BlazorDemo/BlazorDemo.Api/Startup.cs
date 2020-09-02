@@ -27,6 +27,16 @@ namespace BlazorDemo.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin();
+                        builder.AllowAnyMethod();
+                        builder.AllowAnyHeader();
+                    });
+            });
             services.AddControllers();
             services.AddDbContext<ExchangeContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("default")));
@@ -44,6 +54,8 @@ namespace BlazorDemo.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("CorsPolicy");
 
             app.UseAuthorization();
 

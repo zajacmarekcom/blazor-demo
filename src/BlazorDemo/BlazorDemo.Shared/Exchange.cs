@@ -2,10 +2,11 @@
 {
     public class Exchange
     {
-        public string name { get; set; }
-        public string acronym { get; set; }
-        public string mic { get; set; }
-        public string country_code { get; set; }
-        public string city { get; set; }
+        public string Name { get; set; }
+        public string Acronym { get; set; }
+        public string Identifier { get; set; }
+        public string Country { get; set; }
+        public string City { get; set; }
+        public string Currency { get; set; }
     }
 }

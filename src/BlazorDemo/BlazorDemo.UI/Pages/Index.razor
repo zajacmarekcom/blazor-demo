@@ -1,26 +1,20 @@
 ﻿@page "/"
 @inject HttpClient httpClient
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
-
-<Button OnClick="RequestData">Get exchanges</Button>
-
-<Table DataSource="@Exchanges">
-    <Column @bind-Field="@context.name" Title="Name"></Column>
-    <Column @bind-Field="@context.acronym" Title="Acronym"></Column>
-    <Column @bind-Field="@context.mic" Title="Mic"></Column>
-    <Column @bind-Field="@context.country_code" Title="Country"></Column>
-    <Column @bind-Field="@context.city" Title="City"></Column>
+<Table DataSource="@Exchanges" PageSize="25">
+    <Column Sortable="true" @bind-Field="@context.Name" Title="Name"></Column>
+    <Column Sortable="true" @bind-Field="@context.Acronym" Title="Acronym"></Column>
+    <Column Sortable="true" @bind-Field="@context.Identifier" Title="MIC"></Column>
+    <Column Sortable="true" @bind-Field="@context.Country" Title="Country"></Column>
+    <Column Sortable="true" @bind-Field="@context.City" Title="City"></Column>
+    <Column Sortable="true" @bind-Field="@context.Currency" Title="Currency"></Column>
 </Table>
 
 @code {
     private IEnumerable<Exchange> Exchanges = new List<Exchange>();
 
-    private async void RequestData()
+    protected override async Task OnInitializedAsync()
     {
+        Exchanges = await httpClient.GetFromJsonAsync<IEnumerable<Exchange>>("https://localhost:5001/api/stock");
     }
 }
