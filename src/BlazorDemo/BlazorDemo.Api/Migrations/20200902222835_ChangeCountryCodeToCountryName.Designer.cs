@@ -4,14 +4,16 @@ using BlazorDemo.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlazorDemo.Api.Migrations
 {
     [DbContext(typeof(ExchangeContext))]
-    partial class ExchangeContextModelSnapshot : ModelSnapshot
+    [Migration("20200902222835_ChangeCountryCodeToCountryName")]
+    partial class ChangeCountryCodeToCountryName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,11 +40,14 @@ namespace BlazorDemo.Api.Migrations
                     b.Property<decimal>("Low")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("StockMarket")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Symbol")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Volume")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("Volume")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -74,27 +79,6 @@ namespace BlazorDemo.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("StockMarkets");
-                });
-
-            modelBuilder.Entity("BlazorDemo.Api.Data.Models.TickerEntity", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StockIdentifierCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Symbol")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tickers");
                 });
 
             modelBuilder.Entity("BlazorDemo.Api.Data.Models.StockMarketEntity", b =>

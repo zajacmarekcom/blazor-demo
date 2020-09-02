@@ -8,7 +8,7 @@ namespace BlazorDemo.Api.Data.Models
         public string Name { get; set; }
         public string Acronym { get; set; }
         public string IdentifierCode { get; set; }
-        public string CountryCode { get; set; }
+        public string Country { get; set; }
         public string City { get; set; }
         public Currency Currency { get; set; }
     }

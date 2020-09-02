@@ -4,14 +4,16 @@ using BlazorDemo.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlazorDemo.Api.Migrations
 {
     [DbContext(typeof(ExchangeContext))]
-    partial class ExchangeContextModelSnapshot : ModelSnapshot
+    [Migration("20200902223801_AddTickers")]
+    partial class AddTickers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,8 +43,8 @@ namespace BlazorDemo.Api.Migrations
                     b.Property<string>("Symbol")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Volume")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("Volume")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

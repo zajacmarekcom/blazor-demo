@@ -4,14 +4,16 @@ using BlazorDemo.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlazorDemo.Api.Migrations
 {
     [DbContext(typeof(ExchangeContext))]
-    partial class ExchangeContextModelSnapshot : ModelSnapshot
+    [Migration("20200902225930_ChangeVolumeType")]
+    partial class ChangeVolumeType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

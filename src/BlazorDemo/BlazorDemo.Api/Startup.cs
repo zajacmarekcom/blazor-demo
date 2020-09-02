@@ -30,6 +30,7 @@ namespace BlazorDemo.Api
             services.AddControllers();
             services.AddDbContext<ExchangeContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("default")));
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -10,6 +10,7 @@ namespace BlazorDemo.Api.Data
 
         public DbSet<StockMarketEntity> StockMarkets { get; set; }
         public DbSet<EndOfDayEntity> EndOfDays { get; set; }
+        public DbSet<TickerEntity> Tickers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
