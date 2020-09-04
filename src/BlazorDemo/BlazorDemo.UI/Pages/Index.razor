@@ -1,8 +1,11 @@
 ﻿@page "/"
 @inject HttpClient httpClient
+@using BlazorDemo.UI.Components
 
 <Table DataSource="@Exchanges" PageSize="25">
-    <Column Sortable="true" @bind-Field="@context.Name" Title="Name"></Column>
+    <Column Sortable="true" @bind-Field="@context.Name" Title="Name">
+        <a href="#" @onclick="@(() => OpenList(context.Identifier))">@context.Name</a>
+    </Column>
     <Column Sortable="true" @bind-Field="@context.Acronym" Title="Acronym"></Column>
     <Column Sortable="true" @bind-Field="@context.Identifier" Title="MIC"></Column>
     <Column Sortable="true" @bind-Field="@context.Country" Title="Country"></Column>
@@ -10,11 +13,19 @@
     <Column Sortable="true" @bind-Field="@context.Currency" Title="Currency"></Column>
 </Table>
 
+<StockList @ref="list"></StockList>
+
 @code {
     private IEnumerable<Exchange> Exchanges = new List<Exchange>();
+    StockList list;
 
     protected override async Task OnInitializedAsync()
     {
         Exchanges = await httpClient.GetFromJsonAsync<IEnumerable<Exchange>>("https://localhost:5001/api/stock");
+    }
+
+    private void OpenList(string identifier)
+    {
+        list.OpenList(identifier);
     }
 }
