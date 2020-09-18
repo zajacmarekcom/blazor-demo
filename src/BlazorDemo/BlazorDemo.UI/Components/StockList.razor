@@ -1,11 +1,4 @@
-﻿<Modal Title="@("Tickers")"
-       Visible="@_visible">
-    <Table DataSource="@Tickers" PageSize="25">
-        <Column Sortable="true" @bind-Field="@context.Name" Title="Name"></Column>
-        <Column Sortable="true" @bind-Field="@context.Symbol" Title="Acronym"></Column>
-    </Table>
-</Modal>
-
+﻿
 @code {
     private bool _visible = false;
     private IEnumerable<Ticker> Tickers;

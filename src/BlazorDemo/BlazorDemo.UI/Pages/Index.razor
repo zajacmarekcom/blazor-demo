@@ -1,31 +1,178 @@
 ﻿@page "/"
 @inject HttpClient httpClient
 @using BlazorDemo.UI.Components
+@using ChartJs.Blazor.Charts
+@using ChartJs.Blazor.ChartJS
+@using ChartJs.Blazor.ChartJS.Common.Properties
+@using ChartJs.Blazor.ChartJS.Common.Enums
+@using ChartJs.Blazor.ChartJS.Common.Axes
+@using ChartJs.Blazor.ChartJS.Common.Axes.Ticks
+@using ChartJs.Blazor.ChartJS.Common.Handlers
+@using ChartJs.Blazor.ChartJS.Common.Time
+@using ChartJs.Blazor.ChartJS.LineChart
 
-<Table DataSource="@Exchanges" PageSize="25">
-    <Column Sortable="true" @bind-Field="@context.Name" Title="Name">
-        <a href="#" @onclick="@(() => OpenList(context.Identifier))">@context.Name</a>
-    </Column>
-    <Column Sortable="true" @bind-Field="@context.Acronym" Title="Acronym"></Column>
-    <Column Sortable="true" @bind-Field="@context.Identifier" Title="MIC"></Column>
-    <Column Sortable="true" @bind-Field="@context.Country" Title="Country"></Column>
-    <Column Sortable="true" @bind-Field="@context.City" Title="City"></Column>
-    <Column Sortable="true" @bind-Field="@context.Currency" Title="Currency"></Column>
+<Table Narrow="true" Hoverable="true" Striped="true">
+    <TableHeader ThemeContrast="ThemeContrast.Light">
+        <TableRow>
+            <TableHeaderCell>Name</TableHeaderCell>
+            <TableHeaderCell>Acronym</TableHeaderCell>
+            <TableHeaderCell>MIC</TableHeaderCell>
+            <TableHeaderCell>Country</TableHeaderCell>
+            <TableHeaderCell>City</TableHeaderCell>
+            <TableHeaderCell>Currency</TableHeaderCell>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+        @foreach (var row in Exchanges)
+        {
+            <TableRow Clicked="() => OnRowSelection(row.Identifier)">
+                <TableRowCell>@row.Name</TableRowCell>
+                <TableRowCell>@row.Acronym</TableRowCell>
+                <TableRowCell>@row.Identifier</TableRowCell>
+                <TableRowCell>@row.Country</TableRowCell>
+                <TableRowCell>@row.City</TableRowCell>
+                <TableRowCell>@row.Currency</TableRowCell>
+            </TableRow>
+        }
+    </TableBody>
 </Table>
 
-<StockList @ref="list"></StockList>
+<Modal @ref="detailsRef">
+    <ModalBackdrop />
+    <ModalContent Size="ModalSize.ExtraLarge">
+        <ModalHeader>
+            <ModalTitle>Details</ModalTitle>
+            <CloseButton Clicked="OnDetailsHide"></CloseButton>
+        </ModalHeader>
+        <ModalBody MaxHeight="60">
+            <Row>
+                <Column ColumnSize="ColumnSize.Is4" Style="overflow-y: scroll; height: 55vh;">
+                    <Table Narrow="true" FullWidth="false" Hoverable="true" Striped="true">
+                        <TableHeader ThemeContrast="ThemeContrast.Light">
+                            <TableRow>
+                                <TableHeaderCell>Name</TableHeaderCell>
+                                <TableHeaderCell>Symbol</TableHeaderCell>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            @foreach (var row in Tickers)
+                            {
+                                <TableRow Clicked="() => OnTickerClick(row.Symbol)">
+                                    <TableRowCell>@row.Name</TableRowCell>
+                                    <TableRowCell>@row.Symbol</TableRowCell>
+                                </TableRow>
+                            }
+                        </TableBody>
+                    </Table>
+                </Column>
+                <Column ColumnSize="ColumnSize.Is8">
+                    <h3 style="display: @(string.IsNullOrEmpty(TickerSelected) ? "none" : "block")">Close prices for : <b>@TickerSelected</b></h3>
+                    <ChartJsLineChart @ref="lineChartJs" Config="@lineConfig" Width="600" Height="300"></ChartJsLineChart>
+                </Column>
+            </Row>
+        </ModalBody>
+    </ModalContent>
+</Modal>
 
 @code {
     private IEnumerable<Exchange> Exchanges = new List<Exchange>();
+    private IEnumerable<Ticker> Tickers = new List<Ticker>();
+    private IEnumerable<DayData> DayDatas = new List<DayData>();
+    private Modal detailsRef;
     StockList list;
+    LineConfig lineConfig;
+    ChartJsLineChart lineChartJs;
+    LineDataset<TimeTuple<decimal>> dataSet;
+    string TickerSelected = String.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        lineConfig = new LineConfig
+        {
+            Options = new LineOptions
+            {
+                Responsive = true,
+                Title = new OptionsTitle
+                {
+                    Display = false
+                },
+                Legend = new Legend
+                {
+                    Display = false
+                },
+                Tooltips = new Tooltips
+                {
+                    Mode = InteractionMode.Nearest,
+                    Intersect = false
+                },
+                Scales = new Scales
+                {
+                    xAxes = new List<CartesianAxis>
+                    {
+                        new TimeAxis
+                        {
+                            Distribution = TimeDistribution.Linear,
+                            Ticks = new TimeTicks
+                            {
+                                Source = TickSource.Data
+                            },
+                            Time = new TimeOptions
+                            {
+                                Unit = TimeMeasurement.Day,
+                                Round = TimeMeasurement.Day,
+                                TooltipFormat = "DD/MM/YYYY",
+                                DisplayFormats = TimeDisplayFormats.DE_CH
+                            },
+                            ScaleLabel = new ScaleLabel
+                            {
+                                LabelString = "Time"
+                            }
+                        }
+                    }
+                }
+            }
+        };
         Exchanges = await httpClient.GetFromJsonAsync<IEnumerable<Exchange>>("https://localhost:5001/api/stock");
     }
 
     private void OpenList(string identifier)
     {
         list.OpenList(identifier);
+    }
+
+    async Task OnRowSelection(string id)
+    {
+        Tickers = await httpClient.GetFromJsonAsync<IEnumerable<Ticker>>($"https://localhost:5001/api/stock/tickers/{id}");
+        Tickers = Tickers.OrderBy(x => x.Symbol);
+        detailsRef.Show();
+    }
+
+    void OnDetailsHide()
+    {
+        DayDatas = new List<DayData>();
+        lineConfig.Data.Datasets.Clear();
+        TickerSelected = string.Empty;
+        detailsRef.Hide();
+    }
+
+    async Task OnTickerClick(string symbol)
+    {
+        TickerSelected = symbol;
+        DayDatas = await httpClient.GetFromJsonAsync<IEnumerable<DayData>>($"https://localhost:5001/api/stock/tickers/daydata/{symbol}");
+
+        dataSet = new LineDataset<TimeTuple<decimal>>
+        {
+            BackgroundColor = ColorUtil.ColorString(0, 0, 255, 0.5),
+            BorderColor = ColorUtil.ColorString(0, 0, 255, 0.5),
+            Fill = false,
+            BorderWidth = 2,
+            PointRadius = 3,
+            PointBorderWidth = 1,
+            SteppedLine = SteppedLine.False,
+            LineTension = 0
+        };
+        lineConfig.Data.Datasets.Clear();
+        dataSet.AddRange(DayDatas.Select(p => new TimeTuple<decimal>(new Moment(p.X), p.Y)));
+        lineConfig.Data.Datasets.Add(dataSet);
     }
 }

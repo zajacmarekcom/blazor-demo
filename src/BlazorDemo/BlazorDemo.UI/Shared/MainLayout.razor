@@ -1,9 +1,48 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 
-<Layout>
+<Layout Sider="true">
+    <LayoutSider>
+        <LayoutSiderContent></LayoutSiderContent>
+    </LayoutSider>
     <Layout>
-        <Header><NavMenu></NavMenu></Header>
-        <Content>@Body</Content>
-        <Footer>Footer</Footer>
+        <LayoutHeader Fixed="true">
+            <Bar
+                 Breakpoint="Breakpoint.Desktop"
+                 Background="Background.Light"
+                 ThemeContrast="ThemeContrast.Light">
+                <BarBrand>
+                    <BarItem>
+                        <BarLink To="/">Blazor Demo</BarLink>
+                    </BarItem>
+                </BarBrand>
+                <BarToggler></BarToggler>
+                <BarMenu>
+                    <BarStart>
+
+                    </BarStart>
+                    <BarEnd>
+                        <BarItem>
+                            <Button Active="IsCounterActive()" Type="ButtonType.Button" Clicked="OnBtnClick">Counter</Button>
+                        </BarItem>
+                    </BarEnd>
+                </BarMenu>
+            </Bar>
+        </LayoutHeader>
+        <LayoutContent>
+            @Body
+        </LayoutContent>
     </Layout>
 </Layout>
+
+@code {
+    void OnBtnClick()
+    {
+        NavigationManager.NavigateTo("/counter");
+    }
+
+    bool IsCounterActive()
+    {
+        return NavigationManager.Uri.Contains("/counter");
+    }
+}

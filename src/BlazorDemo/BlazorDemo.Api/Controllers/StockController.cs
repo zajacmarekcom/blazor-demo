@@ -33,5 +33,29 @@ namespace BlazorDemo.Api.Controllers
 
             return exchanges;
         }
+
+        [HttpGet("tickers/{id}")]
+        public async Task<IEnumerable<Ticker>> GetTickersForStock(string id)
+        {
+            var tickers = await _context.Tickers.Where(x => x.StockIdentifierCode == id).Select(x => new Ticker()
+            {
+                Name = x.Name,
+                Symbol = x.Symbol
+            }).ToListAsync();
+
+            return tickers;
+        }
+
+        [HttpGet("tickers/daydata/{symbol}")]
+        public async Task<IEnumerable<DayData>> GetDayData(string symbol)
+        {
+            var data = await _context.EndOfDays.Where(x => x.Symbol == symbol).OrderBy(x => x.Date).Select(x => new DayData
+            {
+                X = x.Date,
+                Y = x.Close
+            }).ToListAsync();
+
+            return data;
+        }
     }
 }
